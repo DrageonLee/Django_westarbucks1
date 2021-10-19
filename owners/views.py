@@ -21,6 +21,35 @@ class OwnerListView(View) :
 
         return JsonResponse({"message" : "SUCCESS"}, status = 201)
 
+    def get(self, request):
+        owners = Owner.objects.all()       
+
+        result = []
+
+        for owner in owners:
+            dogs = owner.dog_set.all()
+            dog_list = []
+
+            for dog in dogs:
+                
+                dog_list.append(
+                    {
+                        "name" : dog.name,
+                        "age" : dog.age
+                    }
+                )
+
+            result.append(
+                {
+                    "name" : owner.name,
+                    "email" : owner.email,
+                    "age": owner.age,
+                    "dog_list" : dog_list
+                }
+            )
+                
+        return JsonResponse({"result" : result}, status = 200)
+
 class DogListView(View) :
     def post(self, request):
 
@@ -35,3 +64,27 @@ class DogListView(View) :
 
         
         return JsonResponse({"message" : "SUCCESS"}, status = 201)
+
+    def get(self, request):
+
+        dogs = Dog.objects.all()
+
+        result = []
+        for dog in dogs:
+            result.append(
+                {
+                    "id" : dog.id,
+                    "name" : dog.name,
+                    "age": dog.age,
+                    "owner" : {
+                        "id" : dog.owner.id,
+                        "name" : dog.owner.name,
+                        "email" : dog.owner.email,
+                        "age" : dog.owner.age
+
+                    }
+
+                }
+            )
+
+            return JsonResponse({"dogs" : result}, status = 200)
